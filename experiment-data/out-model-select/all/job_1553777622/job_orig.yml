@@ -1,0 +1,48 @@
+job:
+  classifier:
+    feature_set:
+      name: features.feature_sets.AvgWordFreqFeatureSet
+    sampler:
+      name: features.sampling.RandomOversampler
+  exec:
+    strategy:
+      name: unmasking.strategies.FeatureRemoval
+      parameters:
+        eliminate: 20
+        folds: 10
+        iterations: 24
+        monotonize: false
+        relative: false
+        vector_size: 500
+  experiment:
+    aggregators: []
+    configuration_expander:
+      name: job.configuration.ProductExpander
+    configurations: []
+    repetitions: 10
+  input:
+    parser:
+      name: input.formats.PanParser
+      parameters:
+        corpus_path: corpora/gutenberg_pan_test
+    tokenizer:
+      name: input.tokenizers.RandomWordChunkTokenizer
+      parameters:
+        chunk_size: 1000
+        num_chunks: 30
+  output_dir: out-model-select/
+  outputs:
+  - events:
+    - name: onPairGenerated
+    - name: onUnmaskingFinished
+    name: output.formats.UnmaskingStatAccumulator
+  - events:
+    - name: onUnmaskingRoundFinished
+    name: output.formats.UnmaskingCurvePlotter
+    parameters:
+      display: false
+    rc_file: plot_rc.yml
+  - events:
+    - name: onChunkingProgress
+    - name: onPairGenerated
+    name: output.formats.ProgressPrinter

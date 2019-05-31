@@ -1,0 +1,53 @@
+job:
+  classifier:
+    feature_set:
+      name: features.feature_sets.MetaFeatureSet
+      parameters:
+        feature_proportions:
+        - 1
+        sub_features:
+        - name: features.feature_sets.AvgWordFreqFeatureSet
+    sampler:
+      name: features.sampling.RandomOversampler
+  exec:
+    strategy:
+      name: unmasking.strategies.FeatureRemoval
+      parameters:
+        eliminate: 10
+        folds: 10
+        iterations: auto
+        monotonize: false
+        relative: false
+        vector_size: 250
+  experiment:
+    aggregators:
+    - events:
+      - name: onUnmaskingFinished
+      - name: onPairGenerated
+      name: output.aggregators.CurveAverageAggregator
+    - events:
+      - name: onJobFinished
+      name: output.aggregators.AggregatedCurvePlotter
+      parameters:
+        display: false
+      rc_file: plot_rc.yml
+    configuration_expander:
+      name: job.configuration.ZipExpander
+    configurations: null
+    repetitions: 1
+  output_dir: out_gridsearch
+  outputs:
+  - events:
+    - name: onPairGenerated
+    - name: onUnmaskingFinished
+    name: output.formats.UnmaskingStatAccumulator
+  - events:
+    - name: onUnmaskingRoundFinished
+    name: output.formats.UnmaskingCurvePlotter
+    parameters:
+      display: false
+    rc_file: plot_rc.yml
+  - events:
+    - name: onChunkingProgress
+    - name: onPairGenerated
+    name: output.formats.ProgressPrinter
