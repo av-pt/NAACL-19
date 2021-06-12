@@ -6,6 +6,7 @@ unique.
 First unzip file with `unzip corpus.zip`.
 There should be two subdirectories in this directory:
 gutenberg_train, gutenberg_test
+Then run `python toPan20.py`
 
 Goal:
 A .jsonl training / test file with each line:
@@ -59,7 +60,7 @@ def read_data(folder_name, suffix):
         d['meta'] = m
 
         data.append(d)
-    return data
+    return sorted(data, key=lambda x: x['id'])
 
 
 def read_truth(folder_name, suffix):
@@ -92,12 +93,12 @@ def main():
     combined_truth = train_truth + test_truth
 
     os.makedirs('pan20', exist_ok=True)
-    persist_jsonl('gutenberg_train.jsonl', train)
-    persist_jsonl('gutenberg_train_truth.jsonl', train_truth)
-    persist_jsonl('gutenberg_test.jsonl', test)
-    persist_jsonl('gutenberg_test_truth.jsonl', test_truth)
-    persist_jsonl('gutenberg_combined.jsonl', combined)
-    persist_jsonl('gutenberg_combined_truth.jsonl', combined_truth)
+    persist_jsonl('train-gb.jsonl', train)
+    persist_jsonl('train-gb-truth.jsonl', train_truth)
+    persist_jsonl('test-gb.jsonl', test)
+    persist_jsonl('test-gb-truth.jsonl', test_truth)
+    persist_jsonl('gb.jsonl', combined)
+    persist_jsonl('gb-truth.jsonl', combined_truth)
 
 
 if __name__ == '__main__':
